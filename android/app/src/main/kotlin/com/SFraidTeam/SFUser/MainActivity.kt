@@ -1,6 +1,12 @@
 package com.SFraidTeam.SFUser
 
+import android.Manifest
 import android.content.ComponentName
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.Settings
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.IBinder
@@ -62,10 +68,51 @@ class MainActivity : FlutterActivity() {
                     }
                 }
 
+                "hasStorageAccess" -> {
+                    result.success(hasStorageAccess())
+                }
+
+                "requestStorageAccess" -> {
+                    requestStorageAccess()
+                    result.success(null)
+                }
+
                 else -> {
                     result.notImplemented()
                 }
             }
+        }
+    }
+
+    @Keep
+    private fun hasStorageAccess(): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return Environment.isExternalStorageManager()
+        }
+        return checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED &&
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED
+    }
+
+    @Keep
+    private fun requestStorageAccess() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // "All files access" can only be granted in system settings
+            startActivity(
+                Intent(
+                    Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                    Uri.parse("package:$packageName")
+                )
+            )
+        } else {
+            requestPermissions(
+                arrayOf(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ),
+                1001
+            )
         }
     }
 

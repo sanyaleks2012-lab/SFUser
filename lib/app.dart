@@ -11,6 +11,7 @@ import 'package:sfuser/repo.dart';
 import 'package:sfuser/pages/debug.dart';
 import 'package:sfuser/ui/app_bar.dart';
 import 'package:sfuser/logic/enchantment.dart';
+import 'package:sfuser/logic/game_package.dart';
 import 'package:sfuser/logic/item_database.dart';
 import 'package:sfuser/logic/sf_user_storage.dart';
 import 'package:sfuser/main.dart';
@@ -28,6 +29,9 @@ import 'package:uuid/uuid.dart';
 import 'package:xml/xml.dart';
 
 final Signal<bool> initialized = signals_core.signal(false);
+// Bumped whenever game data is (re)loaded; pages are re-created on change
+// so they show the records of the selected game package.
+final Signal<int> gameDataVersion = signals_core.signal(0);
 final Signal<int> currentPageIndex = signals_core.signal(0);
 Signal<PackageInfo?> package = signal(null);
 
@@ -53,6 +57,47 @@ Future<void> showConfirmationDialog(Widget title, Widget content,
                   onPressed: () => onConfirm(ctx), child: const Text("Confirm"))
             ],
           ));
+}
+
+/// Loads everything that depends on the game package and on /sdcard/SFUser.
+/// Used on start-up and when the game package is switched.
+Future<void> loadGameData() async {
+  try {
+    await SfUserStorage.syncAssets();
+    await ItemDatabase.load();
+    ItemDatabase.traits = (await ItemDatabase.loadTraits()).toList();
+    logger.i("Loaded item database from ${SfUserStorage.root}");
+
+    await EnchantmentsManager.loadFromFiles();
+    logger.i("Loaded enchantments");
+
+    RecordsManager.records = await RecordsManager.loadRecords();
+    if (RecordsManager.activeRecord == null) {
+      logger.i("There are no records to load, creating a new one...");
+      final path = "${RecordsManager.userdataPath}/users.xml";
+      final tree = XmlDocument.parse(await readFile(path));
+      final record =
+          Record(tree, RecordMetadata("Save #1", const Uuid().v8(), true));
+      RecordsManager.records.add(record);
+      RecordsManager.activeRecord = record;
+      RecordsManager.saveRecord(record);
+    }
+    logger.i("Loaded ${RecordsManager.records.length} record(s)");
+
+    gameDataVersion.value++;
+    initialized.value = true;
+  } catch (e, s) {
+    initialized.value = false;
+    logger.e("Unable to load game data: $e\n$s");
+  }
+}
+
+/// Switches the game package and reloads its saves without restarting the app.
+/// Unsaved changes in the current record are discarded.
+Future<void> switchGamePackage(String value) async {
+  await setGamePackage(value);
+  logger.i("Game package set to $value");
+  await loadGameData();
 }
 
 class _AppState extends State<App> {
@@ -81,6 +126,7 @@ class _AppState extends State<App> {
     await getExternalStorageDirectory(); // to create the data folder
     package.value = await PackageInfo.fromPlatform();
     await _tryToShowNotice();
+    await _ensureStorageAccess(context);
 
     if (await _tryToConnectToShizuku(context)) {
       logger.i("Shizuku is available");
@@ -115,50 +161,32 @@ class _AppState extends State<App> {
       return;
     }
 
-    try {
-      await SfUserStorage.syncAssets();
-      await ItemDatabase.load();
-      ItemDatabase.traits = (await ItemDatabase.loadTraits()).toList();
-      logger.i("Loaded item database from ${SfUserStorage.root}");
-    } catch (e, s) {
-      logger.e("Unable to load item database: $e\n$s");
-      return;
-    }
-
-    EnchantmentsManager.loadFromFiles().then((_) async {
-      logger.i("Loaded enchantments");
-      try {
-        await _tryToLoadRecords();
-        logger.i("Loaded ${RecordsManager.records.length} record(s)");
-        setState(() {
-          initialized.value = true;
-        });
-      } catch (e, s) {
-        setState(() {
-          logger.e("Unable to load the save file");
-          logger.e("$e\n$s");
-        });
-      }
-    }).onError((e, s) {
-      setState(() {
-        logger.e("Unable to load enchantments");
-        logger.e("$e\n$s");
-      });
-    });
+    await loadGameData();
   }
 
-  Future<void> _tryToLoadRecords() async {
-    RecordsManager.records = await RecordsManager.loadRecords();
-    if (RecordsManager.activeRecord == null) {
-      logger.i("There are no records to load, creating a new one...");
-      final path = "${RecordsManager.userdataPath}/users.xml";
-      final tree = XmlDocument.parse(await readFile(path));
-      final record =
-          Record(tree, RecordMetadata("Save #1", const Uuid().v8(), true));
-      RecordsManager.records.add(record);
-      RecordsManager.activeRecord = record;
-      RecordsManager.saveRecord(record);
+  Future<void> _ensureStorageAccess(BuildContext context) async {
+    if (await BridgeApi.hasStorageAccess()) return;
+
+    logger.i("Requesting access to all files");
+    await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => AlertDialog(
+              title: const Text("File access needed"),
+              content: const Text(
+                  "SFUser keeps its data in /sdcard/SFUser. Allow access to all files on the next screen, then come back to the app."),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    child: const Text("Continue"))
+              ],
+            ));
+    await BridgeApi.requestStorageAccess();
+
+    while (!await BridgeApi.hasStorageAccess()) {
+      await Future.delayed(const Duration(milliseconds: 500));
     }
+    logger.i("File access granted");
   }
 
   Future<void> _tryToShowNotice() async {
@@ -245,7 +273,9 @@ class _AppState extends State<App> {
           : const SizedBox.shrink()),
       body: Watch(
         (_) => initialized.value
-            ? pages.elementAt(currentPageIndex.value)
+            ? KeyedSubtree(
+                key: ValueKey(gameDataVersion.value),
+                child: pages.elementAt(currentPageIndex.value))
             : Column(
                 children: [
                   const Row(

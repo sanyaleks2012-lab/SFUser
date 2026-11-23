@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:sfuser/app.dart';
 import 'package:sfuser/logic/game_package.dart';
@@ -105,9 +104,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       value: gamePackage.value,
                       onChanged: (String? value) {
                         if (value == null || value == gamePackage.value) return;
-                        setGamePackage(value);
-                        Fluttertoast.showToast(
-                            msg: "Restart the app to load saves from $value");
+                        switchGamePackage(value);
                       },
                       items: gamePackages
                           .map((p) => DropdownMenuItem<String>(

@@ -1,6 +1,5 @@
 import 'package:sfuser/logic/equipment_type.dart';
 import 'package:sfuser/logic/sf_user_storage.dart';
-import 'package:sfuser/shizuku_file.dart';
 import 'package:toml/toml.dart';
 import 'package:xml/xml.dart';
 
@@ -74,7 +73,7 @@ class EnchantmentsManager {
     final files = await SfUserStorage.listTomlFiles(
         SfUserStorage.enchantmentDir);
     for (final file in files) {
-      final tomlString = await readFile(file);
+      final tomlString = await SfUserStorage.readText(file);
       final tomlMap = TomlDocument.parse(tomlString).toMap();
       final group = EnchantmentGroup.fromToml(tomlMap["group"]);
       tomlMap.remove("group");

@@ -1,7 +1,6 @@
 import 'package:sfuser/logic/enchantment.dart';
 import 'package:sfuser/logic/equipment_type.dart';
 import 'package:sfuser/logic/sf_user_storage.dart';
-import 'package:sfuser/shizuku_file.dart';
 import 'package:toml/toml.dart';
 
 class ItemTrait {
@@ -21,7 +20,7 @@ class ItemDatabase {
 
   static Future<Iterable<ItemTrait>> loadTraits() async {
     final tomlContent =
-        await readFile(SfUserStorage.dataPath("traits.toml"));
+        await SfUserStorage.readText(SfUserStorage.dataPath("traits.toml"));
     final tomlMap = TomlDocument.parse(tomlContent).toMap();
     return tomlMap.entries.map((e) =>
         ItemTrait(e.key, e.value["display"], int.parse(e.value["color"])));
@@ -30,7 +29,7 @@ class ItemDatabase {
   static Future<void> load() async {
     for (final type in EquipmentType.values) {
       final tomlContent =
-          await readFile(SfUserStorage.dataPath("${type.name}.toml"));
+          await SfUserStorage.readText(SfUserStorage.dataPath("${type.name}.toml"));
       final tomlMap = TomlDocument.parse(tomlContent).toMap();
       dictionary.addAll(tomlMap);
     }

@@ -1,16 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/services.dart';
-import 'package:sfuser/shizuku_api.dart';
-import 'package:sfuser/shizuku_file.dart';
 
 /// Shared data folder on the device, readable and editable by the user:
 ///
 ///   /sdcard/SFUser/enchantment/*.toml  <- assets/enchantments/
 ///   /sdcard/SFUser/data/*.toml         <- assets/item_database/ and assets/traits.toml
 ///
-/// The bundled assets are copied there on every start-up. After that, all
-/// reads go to this folder (through the Shizuku shell), not to the bundle.
+/// The bundled assets are copied there on every start-up. After that, the
+/// data is read from this folder. Needs "all files" access (see StorageAccess).
 class SfUserStorage {
   static const String root = "/sdcard/SFUser";
   static const String enchantmentDir = "enchantment";
@@ -37,29 +35,31 @@ class SfUserStorage {
 
     final dirs = assets.map(_destinationFor).whereType<String>().toSet();
     for (final dir in dirs) {
-      final output = await BridgeApi.runCommand("mkdir -p ${pathOf(dir)}");
-      if (output != null && output.isNotEmpty) {
-        throw FileSystemException("Unable to create ${pathOf(dir)}", output);
-      }
+      await Directory(pathOf(dir)).create(recursive: true);
     }
 
     for (final asset in assets) {
       final dir = _destinationFor(asset);
       if (dir == null) continue;
       final contents = await rootBundle.loadString(asset);
-      await writeFile("${pathOf(dir)}/${asset.split('/').last}", contents);
+      final file = File("${pathOf(dir)}/${asset.split('/').last}");
+      await file.writeAsString(contents, flush: true);
     }
   }
 
   /// Full paths of all toml files in [root]/[dir], sorted by name.
   static Future<List<String>> listTomlFiles(String dir) async {
-    final output = await BridgeApi.runCommand("ls -1 ${pathOf(dir)}") ?? "";
-    final names = output
-        .split("\n")
-        .map((line) => line.trim())
-        .where((name) => name.endsWith(".toml"))
+    final directory = Directory(pathOf(dir));
+    if (!await directory.exists()) return [];
+    final paths = directory
+        .listSync()
+        .whereType<File>()
+        .map((f) => f.path)
+        .where((path) => path.endsWith(".toml"))
         .toList()
       ..sort();
-    return names.map((name) => "${pathOf(dir)}/$name").toList();
+    return paths;
   }
+
+  static Future<String> readText(String path) => File(path).readAsString();
 }

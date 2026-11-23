@@ -3,6 +3,13 @@ import 'package:flutter/services.dart';
 class BridgeApi {
   static const _channel = MethodChannel('com.SFraidTeam.SFUser/shizuku');
 
+  static Future<bool> hasStorageAccess() async =>
+      (await _channel.invokeMethod<bool>("hasStorageAccess")) ?? false;
+
+  static Future<void> requestStorageAccess() async {
+    await _channel.invokeMethod("requestStorageAccess");
+  }
+
   static Future<bool?> pingBinder() async {
     return await _channel.invokeMethod("pingBinder");
   }
