@@ -30,6 +30,8 @@ class Record {
   static const String _disciplePath =
       "$_warriorPath/SessionSettings/ShowDojoDisciple/@Value";
   static const String _experiencePath = "$_warriorPath/@Experience";
+  static const String _ascensionPath =
+      "$_warriorPath/Currencies/@AscensionTicket";
   static const String _unlimitedEnergyPath =
       "$_warriorPath/Items/Item[@Name=\"Unlimited_Energy\"]";
   static final XmlElement _unlimitedEnergyElement = XmlElement(
@@ -54,6 +56,11 @@ class Record {
               XmlAttribute(XmlName("ForgeMaterial$e"), "0"),
             );
       }
+    }
+    if (tree.xpath("//Currencies[@AscensionTicket]").isEmpty) {
+      tree.xpath("//Currencies").first.attributes.add(
+            XmlAttribute(XmlName("AscensionTicket"), "0"),
+          );
     }
     equipment = {for (var e in EquipmentType.values) e: _parseEquipment(e)};
   }
@@ -114,31 +121,11 @@ class Record {
 
   set avatar(String value) => _getWarrior().setAttribute("Avatar", value);
 
-  XmlElement? _findItem(String name) => items.children
-      .whereType<XmlElement>()
-      .where((e) => e.getAttribute("Name") == name)
-      .firstOrNull;
+  int get ascensionTickets =>
+      int.tryParse(_getAttribute(_ascensionPath) ?? "0") ?? 0;
 
-  /// Count of a plain inventory item (e.g. AscensionTicket). 0 if absent.
-  int getItemCount(String name) =>
-      int.tryParse(_findItem(name)?.getAttribute("Count") ?? "0") ?? 0;
-
-  void setItemCount(String name, int count) {
-    final existing = _findItem(name);
-    if (existing != null) {
-      existing.setAttribute("Count", count.toString());
-      return;
-    }
-    items.children.add(XmlElement(XmlName("Item"), [
-      XmlAttribute(XmlName("Name"), name),
-      XmlAttribute(XmlName("Equipped"), "0"),
-      XmlAttribute(XmlName("Count"), count.toString()),
-      XmlAttribute(XmlName("UpgradeLevel"), "0"),
-      XmlAttribute(XmlName("DeliveryTime"), "0"),
-      XmlAttribute(XmlName("AcquireType"), "Item"),
-      XmlAttribute(XmlName("DeliveryUpgradeLevel"), "-1"),
-    ]));
-  }
+  set ascensionTickets(int value) =>
+      setAttribute(_ascensionPath, value.toString());
 
   int get level {
     return int.parse(_getWarrior().getAttribute("Level") ?? "0");

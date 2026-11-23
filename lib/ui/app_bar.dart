@@ -11,7 +11,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext _) {
     return Watch((context) => AppBar(
           toolbarHeight: 200,
-          backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+          backgroundColor: Colors.transparent,
           title: Stack(
             alignment: Alignment.center,
             children: [

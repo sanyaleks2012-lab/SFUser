@@ -12,6 +12,7 @@ import 'package:sfuser/app.dart';
 import 'package:sfuser/pages/records/new_record.dart';
 import 'package:sfuser/logic/record.dart';
 import 'package:sfuser/logic/records_manager.dart';
+import 'package:sfuser/ui/glass.dart';
 import 'package:xml/xml.dart';
 
 class RecordsPage extends StatefulWidget {
@@ -40,10 +41,7 @@ class _RecordsPageState extends State<RecordsPage> {
         controllers[controllerKey] =
             TextEditingController(text: record.metadata.name);
       }
-      return Container(
-        color: theme.brightness == Brightness.light
-            ? theme.colorScheme.surfaceContainerLowest
-            : theme.colorScheme.surfaceTint.withValues(alpha: 0.1),
+      return GlassPanel(
         child: ExpansionTile(
           initiallyExpanded: RecordsManager.activeRecord! == record,
           collapsedShape: const RoundedRectangleBorder(

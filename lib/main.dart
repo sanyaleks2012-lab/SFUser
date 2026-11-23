@@ -6,6 +6,7 @@ import 'package:signals/signals_flutter.dart';
 import 'package:sfuser/app.dart';
 import 'package:sfuser/logic/game_package.dart';
 import 'package:sfuser/themes.dart';
+import 'package:sfuser/ui/glass.dart';
 
 Logs constructLogger() {
   return logger = Logs(
@@ -67,18 +68,27 @@ class _RootAppState extends State<RootApp> {
           final lightTheme = ThemeData(
               colorScheme: lightColorScheme,
               useMaterial3: true,
-              scaffoldBackgroundColor: lightColorScheme.surfaceContainer);
+              scaffoldBackgroundColor: Colors.transparent,
+              appBarTheme: const AppBarTheme(
+                  backgroundColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  scrolledUnderElevation: 0));
 
           final darkTheme = ThemeData(
               colorScheme: darkColorScheme,
               useMaterial3: true,
-              scaffoldBackgroundColor: darkColorScheme.surfaceContainer);
+              scaffoldBackgroundColor: Colors.transparent,
+              appBarTheme: const AppBarTheme(
+                  backgroundColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  scrolledUnderElevation: 0));
           return MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: lightTheme,
               darkTheme: darkTheme,
               themeMode: brightness_,
               title: "SFUser",
+              builder: (context, child) => GlassBackground(child: child!),
               home: const App());
         });
       },

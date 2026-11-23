@@ -12,7 +12,11 @@ extension EquipmentTypeExtension on EquipmentType {
       return EquipmentType.weapon;
     } else if (equipmentId.contains("RANGED")) {
       return EquipmentType.ranged;
-    } else if (equipmentId.contains("MAGIC")) {
+    } else if (equipmentId.contains("MAGIC") ||
+        equipmentId.contains("Sphere1") ||
+        equipmentId.contains("ComboSphere3") ||
+        equipmentId.contains("Sphere2") ||
+        equipmentId.contains("Sphere3")) {
       return EquipmentType.magic;
     } else if (equipmentId.contains("ARMOR") || equipmentId.contains("BODY")) {
       return EquipmentType.armor;

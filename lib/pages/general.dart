@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sfuser/ui/click_tooltip.dart';
 import 'package:sfuser/logic/record.dart';
 import 'package:sfuser/logic/records_manager.dart';
+import 'package:sfuser/ui/glass.dart';
 
 class GeneralPage extends StatefulWidget {
   const GeneralPage({super.key});
@@ -122,11 +123,9 @@ class _GeneralPageState extends State<GeneralPage> {
           "assets/images/dojo.png",
           "Ascension Ticket",
           TextEditingController(
-              text: RecordsManager.activeRecord!
-                  .getItemCount("AscensionTicket")
-                  .toString()), (value) {
-        RecordsManager.activeRecord!
-            .setItemCount("AscensionTicket", int.tryParse(value) ?? 0);
+              text: RecordsManager.activeRecord!.ascensionTickets.toString()),
+          (value) {
+        RecordsManager.activeRecord!.ascensionTickets = int.tryParse(value) ?? 0;
       }),
     ];
 
@@ -145,14 +144,11 @@ class _GeneralPageState extends State<GeneralPage> {
     );
   }
 
-  Container _generateSection(
+  Widget _generateSection(
       String title, Widget icon, String description, List<Field> fields,
       {bool initiallyExpanded = false}) {
-    final theme = Theme.of(context);
-    return Container(
-      color: theme.brightness == Brightness.light
-          ? theme.colorScheme.surfaceContainerLowest
-          : theme.colorScheme.surfaceTint.withValues(alpha: 0.1),
+    return GlassPanel(
+      borderRadius: BorderRadius.zero,
       child: ExpansionTile(
           title: Wrap(spacing: 8, children: [icon, Text(title)]),
           initiallyExpanded: initiallyExpanded,
