@@ -5,6 +5,16 @@ allprojects {
     }
 }
 
+// Lint crashes on url_launcher_android (internal lint bug) and fails the release
+// build. Lint is not needed to produce the APK, so the lintVital* tasks are skipped.
+allprojects {
+    tasks.configureEach { task ->
+        if (task.name.startsWith("lintVital")) {
+            task.enabled = false
+        }
+    }
+}
+
 rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
