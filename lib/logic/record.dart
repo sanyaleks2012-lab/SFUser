@@ -105,6 +105,41 @@ class Record {
     setAttribute(_getCurrencyPath(currency), amount.toString());
   }
 
+  String get firstName => _getWarrior().getAttribute("FirstName") ?? "";
+
+  set firstName(String value) =>
+      _getWarrior().setAttribute("FirstName", value);
+
+  String get avatar => _getWarrior().getAttribute("Avatar") ?? "";
+
+  set avatar(String value) => _getWarrior().setAttribute("Avatar", value);
+
+  XmlElement? _findItem(String name) => items.children
+      .whereType<XmlElement>()
+      .where((e) => e.getAttribute("Name") == name)
+      .firstOrNull;
+
+  /// Count of a plain inventory item (e.g. AscensionTicket). 0 if absent.
+  int getItemCount(String name) =>
+      int.tryParse(_findItem(name)?.getAttribute("Count") ?? "0") ?? 0;
+
+  void setItemCount(String name, int count) {
+    final existing = _findItem(name);
+    if (existing != null) {
+      existing.setAttribute("Count", count.toString());
+      return;
+    }
+    items.children.add(XmlElement(XmlName("Item"), [
+      XmlAttribute(XmlName("Name"), name),
+      XmlAttribute(XmlName("Equipped"), "0"),
+      XmlAttribute(XmlName("Count"), count.toString()),
+      XmlAttribute(XmlName("UpgradeLevel"), "0"),
+      XmlAttribute(XmlName("DeliveryTime"), "0"),
+      XmlAttribute(XmlName("AcquireType"), "Item"),
+      XmlAttribute(XmlName("DeliveryUpgradeLevel"), "-1"),
+    ]));
+  }
+
   int get level {
     return int.parse(_getWarrior().getAttribute("Level") ?? "0");
   }
@@ -169,7 +204,7 @@ class Record {
   }
 
   List<Equipment> _parseEquipment(EquipmentType type) {
-    final selectedId = _getWarrior().getAttribute(type.slot)!;
+    final selectedId = _getWarrior().getAttribute(type.slot) ?? "";
 
     return items.children
         .where((e) =>

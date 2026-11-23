@@ -60,7 +60,9 @@ class Enchantment {
     }
   }
 
-  String? idFor(EquipmentType type) => ids[type];
+  String? idFor(EquipmentType type) =>
+      ids[type] ??
+      (type == EquipmentType.skeleton ? ids.values.firstOrNull : null);
 }
 
 class EnchantmentsManager {

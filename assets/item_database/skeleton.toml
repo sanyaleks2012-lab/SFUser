@@ -1,0 +1,4 @@
+[Skeleton]
+name = "Skeleton"
+description = "The skeleton slot of your character. Enchantments from all perks can be applied to it."
+override_type = "skeleton"

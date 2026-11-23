@@ -27,8 +27,9 @@ class SfUserStorage {
     return null;
   }
 
-  /// Copies the bundled toml data into [root]. Existing files are overwritten
-  /// so the folder always matches the version of the app that is running.
+  /// Exports the bundled toml data into [root], but only files that do not
+  /// exist yet. Files already in the folder are never touched, so edits made
+  /// by the user are kept. Delete a file to get the bundled version back.
   static Future<void> syncAssets() async {
     final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
     final assets = manifest.listAssets();
@@ -41,8 +42,9 @@ class SfUserStorage {
     for (final asset in assets) {
       final dir = _destinationFor(asset);
       if (dir == null) continue;
-      final contents = await rootBundle.loadString(asset);
       final file = File("${pathOf(dir)}/${asset.split('/').last}");
+      if (await file.exists()) continue;
+      final contents = await rootBundle.loadString(asset);
       await file.writeAsString(contents, flush: true);
     }
   }

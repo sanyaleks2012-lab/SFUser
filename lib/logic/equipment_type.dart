@@ -1,6 +1,6 @@
 import 'package:sfuser/logic/item_database.dart';
 
-enum EquipmentType { weapon, ranged, magic, armor, helm }
+enum EquipmentType { weapon, ranged, magic, armor, helm, skeleton }
 
 extension EquipmentTypeExtension on EquipmentType {
   static EquipmentType? fromId(String equipmentId) {
@@ -35,6 +35,8 @@ extension EquipmentTypeExtension on EquipmentType {
         return "Armor";
       case EquipmentType.helm:
         return "Helm";
+      case EquipmentType.skeleton:
+        return "Skeleton";
     }
   }
 

@@ -25,6 +25,8 @@ class Field {
 class _GeneralPageState extends State<GeneralPage> {
   late final List<Field> currencies;
   late final List<Field> progression;
+  late final List<Field> profile;
+  late final List<Field> inventory;
   late final List<List<Field>> sections;
 
   @override
@@ -101,7 +103,34 @@ class _GeneralPageState extends State<GeneralPage> {
       })
     ];
 
-    sections = [currencies, progression];
+    profile = [
+      Field(
+          "assets/images/file.png",
+          "First name",
+          TextEditingController(text: RecordsManager.activeRecord!.firstName),
+          (value) => RecordsManager.activeRecord!.firstName = value.trim()),
+      Field(
+          "assets/images/file.png",
+          "Avatar",
+          TextEditingController(text: RecordsManager.activeRecord!.avatar),
+          (value) => RecordsManager.activeRecord!.avatar = value.trim(),
+          tooltip: "Avatar ID, for example avatar_hero"),
+    ];
+
+    inventory = [
+      Field(
+          "assets/images/dojo.png",
+          "Ascension Ticket",
+          TextEditingController(
+              text: RecordsManager.activeRecord!
+                  .getItemCount("AscensionTicket")
+                  .toString()), (value) {
+        RecordsManager.activeRecord!
+            .setItemCount("AscensionTicket", int.tryParse(value) ?? 0);
+      }),
+    ];
+
+    sections = [currencies, progression, profile, inventory];
   }
 
   Row _generateCheckbox(String name, String imagePath, bool value,
@@ -195,7 +224,17 @@ class _GeneralPageState extends State<GeneralPage> {
           "Progression",
           const Icon(Icons.arrow_upward, color: Colors.lightGreen, size: 24),
           "Levels and Experience",
-          progression)
+          progression),
+      _generateSection(
+          "Profile",
+          const Icon(Icons.person, color: Colors.blue, size: 24),
+          "First name and avatar",
+          profile),
+      _generateSection(
+          "Items",
+          Image.asset("assets/images/treasure-chest.png", width: 24, height: 24),
+          "Ascension Ticket count",
+          inventory),
     ];
     return Scaffold(
       body: Padding(

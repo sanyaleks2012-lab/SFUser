@@ -549,19 +549,23 @@ enchantments = [
 ]
 
 [Sphere1]
+override_type = "magic"
 name = "Minor Charge of Darkness"
 enchantments = ["weakness"]
 
 [Sphere2]
+override_type = "magic"
 name = "Medium Charge of Darkness"
 enchantments = ["stun"]
 
 [Sphere3]
+override_type = "magic"
 name = "Large Charge of Darkness"
 description = "Compared to Blast of the Void, starts slower and has more endlag, ragdoll launches the enemy up but has a bigger hit radius and deals more damage"
 enchantments = ["lifesteal"]
 
 [ComboSphere3]
+override_type = "magic"
 name = "Blast of the Void"
 description = "Compared to Large Charge of Darkness, starts faster, has less endlag, doesn't ragdoll, you can use it to start combos, but it's smaller and deals less damage"
 enchantments = ["enfeeble"]

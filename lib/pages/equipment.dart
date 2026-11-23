@@ -92,6 +92,17 @@ class _EquipmentPageState extends State<EquipmentPage> {
         }
       ),
       (
+        "Skeleton",
+        "assets/images/dojo.png",
+        () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const InventoryView(EquipmentType.skeleton),
+            ),
+          );
+        }
+      ),
+      (
         "Equipment Manager",
         "assets/images/weapons.png",
         () {

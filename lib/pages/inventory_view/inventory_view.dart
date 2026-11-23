@@ -138,7 +138,8 @@ class _InventoryViewState extends State<InventoryView> {
           ],
         ),
       ...suggested,
-      SizedBox(
+      if (widget.equipmentType != EquipmentType.skeleton)
+        SizedBox(
         width: double.maxFinite,
         child: FilledButton(
           onPressed: () {
