@@ -51,6 +51,7 @@ class RecordsManager {
       await writeFile("$userdataPath/users.xml", xml);
       await writeFile("$userdataPath/users_backup.xml", xml);
     }
+    record.markSaved();
   }
 
   static void saveRecordWithToast(Record record) {
@@ -109,7 +110,7 @@ class RecordsManager {
     final dataPath =
         metadata.isActive ? "$userdataPath/users.xml" : "$path/data.xml";
     if (metadata.isActive) {
-      BridgeApi.runCommand("cp $userdataPath/users.xml $path/data.xml");
+      await copyFile("$userdataPath/users.xml", "$path/data.xml");
     }
 
     final tree = XmlDocument.parse(await readFile(dataPath));

@@ -5,6 +5,12 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sfuser/shizuku_api.dart';
 
 Future<String> readFile(String path) async {
+  try {
+    return await File(path).readAsString();
+  } on FileSystemException {
+    // Not readable directly (Android/data on Android 11+): use Shizuku below
+  }
+
   final Directory directory = (await getExternalStorageDirectory())!;
 
   final file = makeTempFile(directory.path);
@@ -43,10 +49,28 @@ File makeTempFile(String path) {
 }
 
 Future<void> writeFile(String targetPath, String contents) async {
+  try {
+    await File(targetPath).writeAsString(contents, flush: true);
+    return;
+  } on FileSystemException {
+    // Not writable directly: use Shizuku below
+  }
+
   final directory = (await getExternalStorageDirectory())!;
   final file = makeTempFile(directory.path);
   await file.writeAsString(contents);
   validateCpOutput(
       targetPath, await BridgeApi.runCommand("cp ${file.path} $targetPath"));
   await BridgeApi.runCommand("rm ${file.path}");
+}
+
+/// Copies a file, directly if allowed, otherwise through the Shizuku shell.
+Future<void> copyFile(String source, String target) async {
+  try {
+    await File(source).copy(target);
+    return;
+  } on FileSystemException {
+    // Fall back to Shizuku below
+  }
+  validateCpOutput(source, await BridgeApi.runCommand("cp $source $target"));
 }

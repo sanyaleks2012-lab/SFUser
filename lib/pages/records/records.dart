@@ -12,7 +12,6 @@ import 'package:sfuser/app.dart';
 import 'package:sfuser/pages/records/new_record.dart';
 import 'package:sfuser/logic/record.dart';
 import 'package:sfuser/logic/records_manager.dart';
-import 'package:sfuser/ui/section_card.dart';
 import 'package:xml/xml.dart';
 
 class RecordsPage extends StatefulWidget {
@@ -41,7 +40,10 @@ class _RecordsPageState extends State<RecordsPage> {
         controllers[controllerKey] =
             TextEditingController(text: record.metadata.name);
       }
-      return SectionCard(
+      return Container(
+        color: theme.brightness == Brightness.light
+            ? theme.colorScheme.surfaceContainerLowest
+            : theme.colorScheme.surfaceTint.withValues(alpha: 0.1),
         child: ExpansionTile(
           initiallyExpanded: RecordsManager.activeRecord! == record,
           collapsedShape: const RoundedRectangleBorder(
@@ -80,13 +82,15 @@ class _RecordsPageState extends State<RecordsPage> {
               ),
               const Spacer(),
               record.metadata.isActive
-                  ? Padding(
-                      padding: const EdgeInsets.only(right: 16.0),
-                      child: Chip(
-                        label: const Text("Active"),
-                        visualDensity: VisualDensity.compact,
-                        backgroundColor: theme.colorScheme.primaryContainer,
-                        side: BorderSide.none,
+                  ? const Padding(
+                      padding: EdgeInsets.only(right: 16.0),
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          "Active",
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     )
                   : const Text(""),

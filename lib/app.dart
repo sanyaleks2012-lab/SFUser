@@ -84,6 +84,9 @@ Future<void> loadGameData() async {
     }
     logger.i("Loaded ${RecordsManager.records.length} record(s)");
 
+    for (final record in RecordsManager.records) {
+      record.markSaved();
+    }
     gameDataVersion.value++;
     initialized.value = true;
   } catch (e, s) {
@@ -130,15 +133,19 @@ class _AppState extends State<App> {
 
     if (await _tryToConnectToShizuku(context)) {
       logger.i("Shizuku is available");
+      if (!await _startBinderService()) return;
     } else {
-      logger.e("Shizuku is not available");
-      return;
+      logger.w("Shizuku is not available, trying direct access to Android/data");
     }
 
+    await loadGameData();
+  }
+
+  Future<bool> _startBinderService() async {
     var startResult = await BridgeApi.startBinderService();
     if (startResult.isNotEmpty) {
       logger.e("Error while starting binder service: $startResult");
-      return;
+      return false;
     }
     var serviceAvailable = await BridgeApi.isBinderServiceAvailable();
     var tries = 0;
@@ -158,10 +165,10 @@ class _AppState extends State<App> {
       setState(() {
         logger.e("Timed out! Can't connect to the binder service");
       });
-      return;
+      return false;
     }
 
-    await loadGameData();
+    return true;
   }
 
   Future<void> _ensureStorageAccess(BuildContext context) async {

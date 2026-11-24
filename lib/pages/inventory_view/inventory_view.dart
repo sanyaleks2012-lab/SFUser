@@ -13,7 +13,6 @@ import 'package:sfuser/pages/inventory_view/equipment_search_bar.dart';
 import 'package:sfuser/pages/inventory_view/new_enchantment.dart';
 import 'package:sfuser/pages/inventory_view/new_item.dart';
 import 'package:sfuser/logic/records_manager.dart';
-import 'package:sfuser/ui/section_card.dart';
 
 class InventoryTile extends StatelessWidget {
   final Widget title;
@@ -28,7 +27,10 @@ class InventoryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return SectionCard(
+    return Container(
+        color: theme.brightness == Brightness.light
+            ? theme.colorScheme.surfaceContainerLowest
+            : theme.colorScheme.surfaceTint.withValues(alpha: 0.1),
         child: ExpansionTile(
           collapsedShape: const RoundedRectangleBorder(
             side: BorderSide(color: Colors.transparent, width: 0),
@@ -304,7 +306,7 @@ class _InventoryViewState extends State<InventoryView> {
                     bottomLeft: Radius.circular(4),
                     bottomRight: Radius.circular(4)),
                 child: Container(
-                    color: theme.colorScheme.surfaceContainerHigh,
+                    color: theme.colorScheme.surfaceContainerLow,
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Text(item.description),
@@ -321,7 +323,7 @@ class _InventoryViewState extends State<InventoryView> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: Container(
-                color: theme.colorScheme.surfaceContainerHigh,
+                color: theme.colorScheme.surfaceContainerLow,
                 child: ExpansionTile(
                   initiallyExpanded: true,
                   collapsedShape: const RoundedRectangleBorder(
@@ -449,7 +451,7 @@ class _InventoryViewState extends State<InventoryView> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Container(
-                  color: theme.colorScheme.surfaceContainerHigh,
+                  color: theme.colorScheme.surfaceContainerLow,
                   child: Padding(
                     padding: const EdgeInsets.all(24.0),
                     child: Column(spacing: 8, children: [
@@ -533,7 +535,7 @@ class _InventoryViewState extends State<InventoryView> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Container(
-                  color: theme.colorScheme.surfaceContainerHigh,
+                  color: theme.colorScheme.surfaceContainerLow,
                   child: Padding(
                     padding: const EdgeInsets.all(24.0),
                     child: Column(spacing: 8, children: [
@@ -741,7 +743,7 @@ class _InventoryViewState extends State<InventoryView> {
                     bottomLeft: Radius.circular(4),
                     bottomRight: Radius.circular(4)),
                 child: Container(
-                    color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                    color: Theme.of(context).colorScheme.surfaceContainerLow,
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Text(description),

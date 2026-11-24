@@ -136,8 +136,11 @@ class _EquipmentPageState extends State<EquipmentPage> {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerLow,
-                borderRadius: BorderRadius.circular(24),
+                color: Theme.of(context)
+                    .colorScheme
+                    .surfaceTint
+                    .withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16),
               ),
               child: TextButton(
                 style: TextButton.styleFrom(

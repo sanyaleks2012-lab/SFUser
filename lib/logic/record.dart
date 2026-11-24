@@ -282,6 +282,16 @@ class Record {
   int get launchIndex =>
       int.parse(_getAttribute("/Root/GameLaunchIndex/@Value") ?? "0");
 
+  String? _savedXml;
+
+  /// Remembers the current state as the saved one (after load and save).
+  void markSaved() {
+    _savedXml = xml;
+  }
+
+  /// True when the record differs from the last saved state.
+  bool get hasUnsavedChanges => _savedXml != null && xml != _savedXml;
+
   String get xml {
     _saveEquipment();
     return tree.toXmlString(pretty: true).replaceAllMapped(
