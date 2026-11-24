@@ -214,12 +214,12 @@ class _EquipmentManagerState extends State<EquipmentManager> {
                           RecordsManager.saveRecord(
                                   RecordsManager.activeRecord!)
                               .then((_) {
-                            editState(() => status =
+                            setState(() => status =
                                 "Added ${equipmentToAdd.length} items");
                           });
                         } else {
                           editState(() {
-                            status = \"Added ${equipmentToAdd.length} items";
+                            status = "Added ${equipmentToAdd.length} items";
                           });
                         }
                       },
@@ -242,11 +242,11 @@ class _EquipmentManagerState extends State<EquipmentManager> {
                           RecordsManager.saveRecord(
                                   RecordsManager.activeRecord!)
                               .then((_) {
-                            editState(() => status =
+                            setState(() => status =
                                 "Removed ${equipmentToRemove.length} items");
                           });
                         } else {
-                          setState(() {
+                          editState(() {
                             status =
                                 "Removed ${equipmentToRemove.length} items";
                           });
