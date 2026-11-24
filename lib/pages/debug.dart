@@ -24,7 +24,7 @@ class DebugPageState extends State<DebugPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Logs Viewer'),
-        backgroundColor: Colors.transparent,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       ),
       floatingActionButton: Stack(
         children: [

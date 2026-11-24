@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sfuser/ui/click_tooltip.dart';
+import 'package:sfuser/ui/section_card.dart';
 import 'package:sfuser/logic/record.dart';
 import 'package:sfuser/logic/records_manager.dart';
-import 'package:sfuser/ui/glass.dart';
 
 class GeneralPage extends StatefulWidget {
   const GeneralPage({super.key});
@@ -16,12 +16,15 @@ class Field {
   final String iconPath;
   final String name;
   final String? tooltip;
+  final bool numeric;
   final TextEditingController controller;
   final void Function(String) callback;
 
   Field(this.iconPath, this.name, this.controller, this.callback,
-      {this.tooltip});
+      {this.tooltip, this.numeric = true});
 }
+
+const _bigValueTooltip = "Setting a value higher that 999 999 999 is not recommended";
 
 class _GeneralPageState extends State<GeneralPage> {
   late final List<Field> currencies;
@@ -30,253 +33,231 @@ class _GeneralPageState extends State<GeneralPage> {
   late final List<Field> inventory;
   late final List<List<Field>> sections;
 
+  Field _numberField(String icon, String name, int value,
+      void Function(String) onSave, {String? tooltip}) {
+    return Field(icon, name, TextEditingController(text: value.toString()),
+        onSave,
+        tooltip: tooltip);
+  }
+
   @override
   void initState() {
     super.initState();
+    final record = RecordsManager.activeRecord!;
+
     currencies = [
-      Field(
-          "assets/images/coin.png",
-          "Coins",
-          TextEditingController(
-              text: RecordsManager.activeRecord!
-                  .getCurrency(Currency.coins)
-                  .toString()), (value) {
+      _numberField("assets/images/coin.png", "Coins",
+          record.getCurrency(Currency.coins), (value) {
         RecordsManager.activeRecord!
             .setCurrency(Currency.coins, int.tryParse(value) ?? 0);
       }),
-      Field(
-          "assets/images/ruby.png",
-          "Gems",
-          TextEditingController(
-              text: RecordsManager.activeRecord!
-                  .getCurrency(Currency.gems)
-                  .toString()), (value) {
+      _numberField("assets/images/ruby.png", "Gems",
+          record.getCurrency(Currency.gems), (value) {
         RecordsManager.activeRecord!
             .setCurrency(Currency.gems, int.tryParse(value) ?? 0);
-      }, tooltip: "Setting a value higher that 999 999 999 is not recommended"),
-      Field(
-          "assets/images/forge_green.png",
-          "Green orbs",
-          TextEditingController(
-              text: RecordsManager.activeRecord!
-                  .getCurrency(Currency.greenOrbs)
-                  .toString()), (value) {
+      }, tooltip: _bigValueTooltip),
+      _numberField("assets/images/forge_green.png", "Green orbs",
+          record.getCurrency(Currency.greenOrbs), (value) {
         RecordsManager.activeRecord!
             .setCurrency(Currency.greenOrbs, int.tryParse(value) ?? 0);
-      }, tooltip: "Setting a value higher that 999 999 999 is not recommended"),
-      Field(
-          "assets/images/forge_red.png",
-          "Red orbs",
-          TextEditingController(
-              text: RecordsManager.activeRecord!
-                  .getCurrency(Currency.redOrbs)
-                  .toString()), (value) {
+      }, tooltip: _bigValueTooltip),
+      _numberField("assets/images/forge_red.png", "Red orbs",
+          record.getCurrency(Currency.redOrbs), (value) {
         RecordsManager.activeRecord!
             .setCurrency(Currency.redOrbs, int.tryParse(value) ?? 0);
-      }, tooltip: "Setting a value higher that 999 999 999 is not recommended"),
-      Field(
-          "assets/images/forge_purple.png",
-          "Purple orbs",
-          TextEditingController(
-              text: RecordsManager.activeRecord!
-                  .getCurrency(Currency.purpleOrbs)
-                  .toString()), (value) {
+      }, tooltip: _bigValueTooltip),
+      _numberField("assets/images/forge_purple.png", "Purple orbs",
+          record.getCurrency(Currency.purpleOrbs), (value) {
         RecordsManager.activeRecord!
             .setCurrency(Currency.purpleOrbs, int.tryParse(value) ?? 0);
-      }, tooltip: "Setting a value higher that 999 999 999 is not recommended"),
+      }, tooltip: _bigValueTooltip),
     ];
 
     progression = [
-      Field(
-          "assets/images/shuriken.png",
-          "Level",
-          TextEditingController(
-              text: RecordsManager.activeRecord!.level.toString()), (value) {
+      _numberField("assets/images/shuriken.png", "Level", record.level,
+          (value) {
         RecordsManager.activeRecord!.level = int.tryParse(value) ?? 1;
       }),
-      Field(
-          "assets/images/shuriken.png",
-          "Experience",
-          TextEditingController(
-              text: RecordsManager.activeRecord!.experience.toString()),
-          (value) {
+      _numberField("assets/images/shuriken.png", "Experience",
+          record.experience, (value) {
         RecordsManager.activeRecord!.experience = int.tryParse(value) ?? 0;
-      })
+      }),
     ];
 
     profile = [
-      Field(
-          "assets/images/file.png",
-          "First name",
-          TextEditingController(text: RecordsManager.activeRecord!.firstName),
-          (value) => RecordsManager.activeRecord!.firstName = value.trim()),
-      Field(
-          "assets/images/file.png",
-          "Avatar",
-          TextEditingController(text: RecordsManager.activeRecord!.avatar),
-          (value) => RecordsManager.activeRecord!.avatar = value.trim(),
-          tooltip: "Avatar ID, for example avatar_hero"),
+      Field("assets/images/file.png", "First name",
+          TextEditingController(text: record.firstName), (value) {
+        RecordsManager.activeRecord!.firstName = value.trim();
+      }, numeric: false),
+      Field("assets/images/file.png", "Avatar",
+          TextEditingController(text: record.avatar), (value) {
+        RecordsManager.activeRecord!.avatar = value.trim();
+      }, tooltip: "Avatar ID, for example avatar_hero", numeric: false),
     ];
 
     inventory = [
-      Field(
-          "assets/images/dojo.png",
-          "Ascension Ticket",
-          TextEditingController(
-              text: RecordsManager.activeRecord!.ascensionTickets.toString()),
-          (value) {
-        RecordsManager.activeRecord!.ascensionTickets = int.tryParse(value) ?? 0;
+      _numberField("assets/images/dojo.png", "Ascension Ticket",
+          record.ascensionTickets, (value) {
+        RecordsManager.activeRecord!.ascensionTickets =
+            int.tryParse(value) ?? 0;
       }),
     ];
 
     sections = [currencies, progression, profile, inventory];
   }
 
-  Row _generateCheckbox(String name, String imagePath, bool value,
-      void Function(bool?) onChanged) {
-    return Row(
-      children: [
-        Image.asset(imagePath, width: 40, height: 40),
-        const SizedBox(width: 20),
-        Text(name),
-        Checkbox(value: value, onChanged: onChanged)
-      ],
+  Widget _fieldRow(Field field) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
+          Image.asset(field.iconPath, width: 28, height: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(field.name, style: theme.textTheme.bodyLarge),
+          ),
+          SizedBox(
+            width: 150,
+            child: TextField(
+              controller: field.controller,
+              keyboardType:
+                  field.numeric ? TextInputType.number : TextInputType.text,
+              textAlign: TextAlign.end,
+              decoration: InputDecoration(
+                isDense: true,
+                filled: true,
+                fillColor: theme.colorScheme.surfaceContainerHighest,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ),
+          if (field.tooltip != null) ...[
+            const SizedBox(width: 4),
+            ClickTooltip(
+              message: field.tooltip,
+              decoration: BoxDecoration(
+                  border: Border.all(width: 1),
+                  borderRadius: BorderRadius.circular(16),
+                  color: theme.canvasColor),
+              textStyle: theme.textTheme.bodyMedium,
+              child: const Icon(Icons.info_outline, size: 20),
+            ),
+          ],
+        ],
+      ),
     );
   }
 
-  Widget _generateSection(
-      String title, Widget icon, String description, List<Field> fields,
+  Widget _section(String title, String description, Widget icon,
+      List<Field> fields,
       {bool initiallyExpanded = false}) {
-    return GlassPanel(
-      borderRadius: BorderRadius.zero,
-      child: ExpansionTile(
-          title: Wrap(spacing: 8, children: [icon, Text(title)]),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: SectionCard(
+        child: ExpansionTile(
           initiallyExpanded: initiallyExpanded,
-          subtitle: Padding(
-            padding: const EdgeInsets.only(left: 32.0),
-            child: Text(description),
-          ),
-          childrenPadding: const EdgeInsets.only(left: 32),
-          collapsedShape: const RoundedRectangleBorder(
-            side: BorderSide(color: Colors.transparent, width: 0),
-          ),
-          shape: const RoundedRectangleBorder(
-            side: BorderSide(color: Colors.transparent, width: 0),
-          ),
-          children: fields.map((field) {
-            return Row(
-              children: [
-                Image.asset(field.iconPath, width: 24, height: 24),
-                const SizedBox(width: 5),
-                Text(field.name),
-                const SizedBox(width: 10),
-                SizedBox(
-                  height: 50,
-                  width: 150,
-                  child: TextField(
-                    controller: field.controller,
-                    decoration: const InputDecoration(
-                      contentPadding: EdgeInsets.only(top: 16, bottom: 0),
-                      border: UnderlineInputBorder(),
-                      isDense: true,
-                    ),
-                  ),
-                ),
-                if (field.tooltip != null) ...[
-                  const Spacer(),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 16.0),
-                    child: ClickTooltip(
-                      message: field.tooltip,
-                      decoration: BoxDecoration(
-                          border: Border.all(width: 1),
-                          borderRadius: BorderRadius.circular(16),
-                          color: Theme.of(context).canvasColor),
-                      textStyle: Theme.of(context).textTheme.bodyMedium,
-                      child: const Icon(Icons.info_outline),
-                    ),
-                  )
-                ]
-              ],
-            );
-          }).toList()),
+          leading: IconTile(child: icon),
+          title: Text(title, style: Theme.of(context).textTheme.titleMedium),
+          subtitle: Text(description),
+          shape: const RoundedRectangleBorder(side: BorderSide.none),
+          collapsedShape: const RoundedRectangleBorder(side: BorderSide.none),
+          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          children: fields.map(_fieldRow).toList(),
+        ),
+      ),
+    );
+  }
+
+  Widget _toggle(String name, String iconPath, bool value,
+      void Function(bool) onChanged) {
+    return SwitchListTile(
+      secondary: Image.asset(iconPath, width: 28, height: 28),
+      title: Text(name),
+      value: value,
+      onChanged: onChanged,
+    );
+  }
+
+  Widget _optionsSection() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: SectionCard(
+        child: ExpansionTile(
+          initiallyExpanded: true,
+          leading: const IconTile(child: Icon(Icons.tune)),
+          title: Text("Options",
+              style: Theme.of(context).textTheme.titleMedium),
+          subtitle: const Text("Toggles for the active save"),
+          shape: const RoundedRectangleBorder(side: BorderSide.none),
+          collapsedShape: const RoundedRectangleBorder(side: BorderSide.none),
+          childrenPadding: const EdgeInsets.only(bottom: 8),
+          children: [
+            _toggle("Dojo Disciple", "assets/images/dojo.png",
+                RecordsManager.activeRecord!.isDiscipleEnabled, (value) {
+              setState(() {
+                RecordsManager.activeRecord!.isDiscipleEnabled = value;
+              });
+            }),
+            _toggle("Unlimited Energy", "assets/images/lighting.png",
+                RecordsManager.activeRecord!.isEnergyUnlimited, (value) {
+              setState(() {
+                RecordsManager.activeRecord!.isEnergyUnlimited = value;
+              });
+            }),
+            _toggle("Show Forge", "assets/images/anvil.png",
+                RecordsManager.activeRecord!.showForge, (value) {
+              setState(() {
+                RecordsManager.activeRecord!.showForge = value;
+              });
+            }),
+          ],
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final sections = [
-      _generateSection(
-          "Currencies",
-          Image.asset(
-            "assets/images/treasure-chest.png",
-            width: 24,
-            height: 24,
-          ),
-          "Coins, Gems and Forge Materials",
-          currencies,
-          initiallyExpanded: true),
-      _generateSection(
-          "Progression",
-          const Icon(Icons.arrow_upward, color: Colors.lightGreen, size: 24),
-          "Levels and Experience",
-          progression),
-      _generateSection(
-          "Profile",
-          const Icon(Icons.person, color: Colors.blue, size: 24),
-          "First name and avatar",
-          profile),
-      _generateSection(
-          "Items",
-          Image.asset("assets/images/treasure-chest.png", width: 24, height: 24),
-          "Ascension Ticket count",
-          inventory),
-    ];
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: ListView(children: [
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              separatorBuilder: (_, index) => const SizedBox(height: 2),
-              itemBuilder: (context, index) {
-                final borderRadius = BorderRadius.vertical(
-                    top: Radius.circular(index == 0 ? 24 : 4),
-                    bottom:
-                        Radius.circular(index == sections.length - 1 ? 24 : 4));
-                return ClipRRect(
-                    borderRadius: borderRadius, child: sections[index]);
-              },
-              itemCount: sections.length,
-            ),
-            const SizedBox(height: 20),
-            _generateCheckbox("Dojo Disciple", "assets/images/dojo.png",
-                RecordsManager.activeRecord!.isDiscipleEnabled, (value) {
-              setState(() {
-                RecordsManager.activeRecord!.isDiscipleEnabled = value ?? false;
-              });
-            }),
-            const SizedBox(height: 6),
-            _generateCheckbox("Unlimited Energy", "assets/images/lighting.png",
-                RecordsManager.activeRecord!.isEnergyUnlimited, (value) {
-              setState(() {
-                RecordsManager.activeRecord!.isEnergyUnlimited = value ?? false;
-              });
-            }),
-            const SizedBox(height: 6),
-            _generateCheckbox("Show Forge", "assets/images/anvil.png",
-                RecordsManager.activeRecord!.showForge, (value) {
-              setState(() {
-                RecordsManager.activeRecord!.showForge = value ?? false;
-              });
-            })
-          ]),
-        ),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+        children: [
+          _section(
+              "Currencies",
+              "Coins, gems and forge materials",
+              Image.asset("assets/images/treasure-chest.png",
+                  width: 26, height: 26),
+              currencies,
+              initiallyExpanded: true),
+          _section(
+              "Progression",
+              "Level and experience",
+              const Icon(Icons.arrow_upward, color: Colors.lightGreen),
+              progression),
+          _section(
+              "Profile",
+              "First name and avatar",
+              const Icon(Icons.person, color: Colors.blue),
+              profile),
+          _section(
+              "Items",
+              "Ascension Ticket count",
+              Image.asset("assets/images/dojo.png", width: 26, height: 26),
+              inventory),
+          _optionsSection(),
+        ],
       ),
-      floatingActionButton:
-          FloatingActionButton(onPressed: save, child: const Icon(Icons.save)),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: save,
+        icon: const Icon(Icons.save),
+        label: const Text("Save"),
+      ),
     );
   }
 

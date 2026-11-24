@@ -61,21 +61,6 @@ class _AboutPageState extends State<AboutPage> {
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     const Divider(),
-                    const Text("Original author: Andreno",
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
-                    Row(
-                      children: [
-                        const Text("Reddit: ",
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
-                        Expanded(
-                          child: _makeHyperlink(
-                              "https://www.reddit.com/user/XAndrenoX/"),
-                        ),
-                      ],
-                    ),
-                    const Divider(),
                     const Text(
                         "Shadow Fight 2: Definitive Edition 64 author: seby7113",
                         style: TextStyle(

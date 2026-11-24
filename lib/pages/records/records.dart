@@ -12,7 +12,7 @@ import 'package:sfuser/app.dart';
 import 'package:sfuser/pages/records/new_record.dart';
 import 'package:sfuser/logic/record.dart';
 import 'package:sfuser/logic/records_manager.dart';
-import 'package:sfuser/ui/glass.dart';
+import 'package:sfuser/ui/section_card.dart';
 import 'package:xml/xml.dart';
 
 class RecordsPage extends StatefulWidget {
@@ -41,7 +41,7 @@ class _RecordsPageState extends State<RecordsPage> {
         controllers[controllerKey] =
             TextEditingController(text: record.metadata.name);
       }
-      return GlassPanel(
+      return SectionCard(
         child: ExpansionTile(
           initiallyExpanded: RecordsManager.activeRecord! == record,
           collapsedShape: const RoundedRectangleBorder(
@@ -80,15 +80,13 @@ class _RecordsPageState extends State<RecordsPage> {
               ),
               const Spacer(),
               record.metadata.isActive
-                  ? const Padding(
-                      padding: EdgeInsets.only(right: 16.0),
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          "Active",
-                          style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.bold),
-                        ),
+                  ? Padding(
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: Chip(
+                        label: const Text("Active"),
+                        visualDensity: VisualDensity.compact,
+                        backgroundColor: theme.colorScheme.primaryContainer,
+                        side: BorderSide.none,
                       ),
                     )
                   : const Text(""),
@@ -251,13 +249,6 @@ class _RecordsPageState extends State<RecordsPage> {
       padding: const EdgeInsets.all(16.0),
       child: ListView(
         children: [
-          const Center(
-            child: Text(
-              "© 2025 Andreno. All rights reserved.",
-              style: TextStyle(fontSize: 14),
-            ),
-          ),
-          const SizedBox(height: 16),
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),

@@ -18,7 +18,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor: theme.colorScheme.surfaceContainer,
           title: const Text("Settings"),
           centerTitle: true),
       body: Watch((context) => Padding(

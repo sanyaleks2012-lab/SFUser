@@ -12,7 +12,6 @@ import 'package:sfuser/pages/debug.dart';
 import 'package:sfuser/ui/app_bar.dart';
 import 'package:sfuser/logic/enchantment.dart';
 import 'package:sfuser/logic/game_package.dart';
-import 'package:sfuser/ui/glass.dart';
 import 'package:sfuser/logic/item_database.dart';
 import 'package:sfuser/logic/sf_user_storage.dart';
 import 'package:sfuser/main.dart';
@@ -237,11 +236,14 @@ class _AppState extends State<App> {
     return Scaffold(
       appBar: const MainAppBar(),
       bottomNavigationBar: Watch((_) => initialized.value
-          ? GlassPanel(
+          ? ClipRRect(
               borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(28), topRight: Radius.circular(28)),
               child: NavigationBar(
-                backgroundColor: Colors.transparent,
+                backgroundColor: Theme.of(context)
+                    .colorScheme
+                    .surfaceTint
+                    .withValues(alpha: 0.1),
                 destinations: [
                   NavigationDestination(
                       icon: Image.asset('assets/images/house.png',
@@ -299,7 +301,10 @@ class _AppState extends State<App> {
                             child: Container(
                           width: constraints.maxWidth * 0.9 - 32,
                           height: constraints.maxHeight,
-                          color: glassInset(theme),
+                          color: theme.brightness == Brightness.light
+                              ? theme.colorScheme.surfaceContainerLowest
+                              : theme.colorScheme.surfaceTint
+                                  .withValues(alpha: 0.1),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: ListView.builder(

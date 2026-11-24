@@ -6,7 +6,6 @@ import 'package:sfuser/logic/item_database.dart';
 import 'package:sfuser/pages/equipment_manager.dart';
 import 'package:sfuser/pages/inventory_view/inventory_view.dart';
 import 'package:sfuser/logic/records_manager.dart';
-import 'package:sfuser/ui/glass.dart';
 
 class EquipmentPage extends StatefulWidget {
   const EquipmentPage({super.key});
@@ -135,8 +134,11 @@ class _EquipmentPageState extends State<EquipmentPage> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            GlassPanel(
-              borderRadius: BorderRadius.circular(16),
+            Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(24),
+              ),
               child: TextButton(
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.all(12),
