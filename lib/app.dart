@@ -12,6 +12,7 @@ import 'package:sfuser/pages/debug.dart';
 import 'package:sfuser/ui/app_bar.dart';
 import 'package:sfuser/logic/enchantment.dart';
 import 'package:sfuser/logic/game_package.dart';
+import 'package:sfuser/logic/unsaved_state.dart';
 import 'package:sfuser/logic/item_database.dart';
 import 'package:sfuser/logic/sf_user_storage.dart';
 import 'package:sfuser/main.dart';
@@ -84,9 +85,7 @@ Future<void> loadGameData() async {
     }
     logger.i("Loaded ${RecordsManager.records.length} record(s)");
 
-    for (final record in RecordsManager.records) {
-      record.markSaved();
-    }
+    markSaved();
     gameDataVersion.value++;
     initialized.value = true;
   } catch (e, s) {

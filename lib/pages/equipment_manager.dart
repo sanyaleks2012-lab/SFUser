@@ -4,6 +4,7 @@ import 'package:sfuser/logic/equipment.dart';
 import 'package:sfuser/logic/equipment_type.dart';
 import 'package:sfuser/logic/item_database.dart';
 import 'package:sfuser/logic/records_manager.dart';
+import 'package:sfuser/logic/unsaved_state.dart';
 import 'package:sfuser/ui/split_filled_button.dart';
 
 class EquipmentManager extends StatefulWidget {
@@ -213,12 +214,12 @@ class _EquipmentManagerState extends State<EquipmentManager> {
                           RecordsManager.saveRecord(
                                   RecordsManager.activeRecord!)
                               .then((_) {
-                            setState(() => status =
+                            editState(() => status =
                                 "Added ${equipmentToAdd.length} items");
                           });
                         } else {
-                          setState(() {
-                            status = "Added ${equipmentToAdd.length} items";
+                          editState(() {
+                            status = \"Added ${equipmentToAdd.length} items";
                           });
                         }
                       },
@@ -241,7 +242,7 @@ class _EquipmentManagerState extends State<EquipmentManager> {
                           RecordsManager.saveRecord(
                                   RecordsManager.activeRecord!)
                               .then((_) {
-                            setState(() => status =
+                            editState(() => status =
                                 "Removed ${equipmentToRemove.length} items");
                           });
                         } else {

@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sfuser/logic/game_package.dart';
 import 'package:sfuser/logic/record.dart';
+import 'package:sfuser/logic/unsaved_state.dart';
 import 'package:sfuser/main.dart';
 import 'package:sfuser/shizuku_api.dart';
 import 'package:sfuser/shizuku_file.dart';
@@ -50,8 +51,8 @@ class RecordsManager {
     if (activeRecord == record) {
       await writeFile("$userdataPath/users.xml", xml);
       await writeFile("$userdataPath/users_backup.xml", xml);
+      markSaved();
     }
-    record.markSaved();
   }
 
   static void saveRecordWithToast(Record record) {

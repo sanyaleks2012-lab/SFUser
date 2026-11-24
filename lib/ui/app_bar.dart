@@ -1,49 +1,12 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:sfuser/app.dart';
-import 'package:sfuser/logic/records_manager.dart';
+import 'package:sfuser/logic/unsaved_state.dart';
 import 'package:sfuser/pages/debug.dart';
 import 'package:sfuser/pages/settings.dart';
 
-class MainAppBar extends StatefulWidget implements PreferredSizeWidget {
+class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MainAppBar({super.key});
-
-  @override
-  State<MainAppBar> createState() => _MainAppBarState();
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-}
-
-class _MainAppBarState extends State<MainAppBar> {
-  Timer? _timer;
-  bool _hasUnsavedChanges = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _timer = Timer.periodic(
-        const Duration(seconds: 1), (_) => _refreshStatus());
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  /// Green when the active save matches the last saved state, yellow when
-  /// there are changes that have not been saved yet.
-  void _refreshStatus() {
-    final record = RecordsManager.activeRecord;
-    final unsaved =
-        initialized.value && record != null && record.hasUnsavedChanges;
-    if (unsaved != _hasUnsavedChanges && mounted) {
-      setState(() => _hasUnsavedChanges = unsaved);
-    }
-  }
 
   @override
   Widget build(BuildContext _) {
@@ -78,18 +41,18 @@ class _MainAppBarState extends State<MainAppBar> {
                   children: [
                     const Text("SFUser"),
                     const SizedBox(width: 8),
-                    Tooltip(
-                      message: _hasUnsavedChanges
-                          ? "Unsaved changes"
-                          : "All changes saved",
-                      child: Icon(
-                        Icons.circle,
-                        size: 12,
-                        color: _hasUnsavedChanges
-                            ? Colors.amber
-                            : Colors.green,
-                      ),
-                    ),
+                    Watch((_) {
+                      final unsaved = hasUnsavedChanges.value;
+                      return Tooltip(
+                        message:
+                            unsaved ? "Unsaved changes" : "All changes saved",
+                        child: Icon(
+                          Icons.circle,
+                          size: 12,
+                          color: unsaved ? Colors.amber : Colors.green,
+                        ),
+                      );
+                    }),
                   ],
                 ),
               ),
@@ -105,4 +68,7 @@ class _MainAppBarState extends State<MainAppBar> {
           ),
         ));
   }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

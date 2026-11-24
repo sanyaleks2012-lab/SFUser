@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sfuser/ui/click_tooltip.dart';
 import 'package:sfuser/logic/record.dart';
 import 'package:sfuser/logic/records_manager.dart';
+import 'package:sfuser/logic/unsaved_state.dart';
 
 class GeneralPage extends StatefulWidget {
   const GeneralPage({super.key});
@@ -180,6 +181,7 @@ class _GeneralPageState extends State<GeneralPage> {
                   width: 150,
                   child: TextField(
                     controller: field.controller,
+                    onChanged: (_) => markUnsaved(),
                     decoration: const InputDecoration(
                       contentPadding: EdgeInsets.only(top: 16, bottom: 0),
                       border: UnderlineInputBorder(),
@@ -259,21 +261,21 @@ class _GeneralPageState extends State<GeneralPage> {
             const SizedBox(height: 20),
             _generateCheckbox("Dojo Disciple", "assets/images/dojo.png",
                 RecordsManager.activeRecord!.isDiscipleEnabled, (value) {
-              setState(() {
+              editState(() {
                 RecordsManager.activeRecord!.isDiscipleEnabled = value ?? false;
               });
             }),
             const SizedBox(height: 6),
             _generateCheckbox("Unlimited Energy", "assets/images/lighting.png",
                 RecordsManager.activeRecord!.isEnergyUnlimited, (value) {
-              setState(() {
+              editState(() {
                 RecordsManager.activeRecord!.isEnergyUnlimited = value ?? false;
               });
             }),
             const SizedBox(height: 6),
             _generateCheckbox("Show Forge", "assets/images/anvil.png",
                 RecordsManager.activeRecord!.showForge, (value) {
-              setState(() {
+              editState(() {
                 RecordsManager.activeRecord!.showForge = value ?? false;
               });
             })

@@ -12,6 +12,7 @@ import 'package:sfuser/app.dart';
 import 'package:sfuser/pages/records/new_record.dart';
 import 'package:sfuser/logic/record.dart';
 import 'package:sfuser/logic/records_manager.dart';
+import 'package:sfuser/logic/unsaved_state.dart';
 import 'package:xml/xml.dart';
 
 class RecordsPage extends StatefulWidget {
@@ -232,7 +233,7 @@ class _RecordsPageState extends State<RecordsPage> {
 
         try {
           final newSave = Record(XmlDocument.parse(content), record.metadata);
-          setState(() {
+          editState(() {
             RecordsManager.records[RecordsManager.records.indexOf(record)] =
                 newSave;
           });

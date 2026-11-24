@@ -13,6 +13,7 @@ import 'package:sfuser/pages/inventory_view/equipment_search_bar.dart';
 import 'package:sfuser/pages/inventory_view/new_enchantment.dart';
 import 'package:sfuser/pages/inventory_view/new_item.dart';
 import 'package:sfuser/logic/records_manager.dart';
+import 'package:sfuser/logic/unsaved_state.dart';
 
 class InventoryTile extends StatelessWidget {
   final Widget title;
@@ -151,7 +152,7 @@ class _InventoryViewState extends State<InventoryView> {
                       RecordsManager
                           .activeRecord!.equipment[widget.equipmentType]!
                           .add(Equipment(widget.equipmentType, text, 1, 0));
-                      setState(() {
+                      editState(() {
                         _searchEquipment(query);
                       });
                     }));
@@ -226,7 +227,7 @@ class _InventoryViewState extends State<InventoryView> {
                       context,
                       (ctx) {
                         Navigator.of(ctx).pop();
-                        setState(() {
+                        editState(() {
                           foundEquipment.remove(item);
                           ownedEquipment.remove(item);
                           _searchEquipment(query);
@@ -263,7 +264,7 @@ class _InventoryViewState extends State<InventoryView> {
                               )
                             : ConfirmButton(
                                 onConfirmed: () {
-                                  setState(() {
+                                  editState(() {
                                     RecordsManager.activeRecord!
                                         .setEquipped(item);
                                   });
@@ -343,7 +344,7 @@ class _InventoryViewState extends State<InventoryView> {
                                     "This will discard all enchantments from this item"),
                                 context, (ctx) {
                               Navigator.of(ctx).pop();
-                              setState(() {
+                              editState(() {
                                 item.enchantments.clear();
                               });
                             });
@@ -367,7 +368,7 @@ class _InventoryViewState extends State<InventoryView> {
                                 const Spacer(),
                                 IconButton(
                                   onPressed: () {
-                                    setState(() {
+                                    editState(() {
                                       item.enchantments.remove(applied);
                                     });
                                   },
@@ -389,7 +390,7 @@ class _InventoryViewState extends State<InventoryView> {
                                           child: Slider(
                                             value: applied.aspect!.toDouble(),
                                             onChanged: (v) {
-                                              setState(() {
+                                              editState(() {
                                                 applied.aspect = v.toInt();
                                               });
                                             },
@@ -417,7 +418,7 @@ class _InventoryViewState extends State<InventoryView> {
                                         EnchantmentsManager.enchantments,
                                     type: widget.equipmentType,
                                     onPressed: (selected, amount) {
-                                      setState(() {
+                                      editState(() {
                                         for (var i = 0; i < amount; i++) {
                                           item.enchantments.add(
                                             AppliedEnchantment(
@@ -461,7 +462,7 @@ class _InventoryViewState extends State<InventoryView> {
                         children: [
                           IconButton(
                               onPressed: () {
-                                setState(() {
+                                editState(() {
                                   item.recipeDelivery = null;
                                 });
                               },
@@ -501,7 +502,7 @@ class _InventoryViewState extends State<InventoryView> {
                         ),
                         FilledButton.icon(
                           onPressed: () {
-                            setState(() {
+                            editState(() {
                               item.recipeDelivery!.time = DateTime.now();
                               Fluttertoast.showToast(msg: "Meido In Hebun!");
                             });
@@ -545,7 +546,7 @@ class _InventoryViewState extends State<InventoryView> {
                         children: [
                           IconButton(
                               onPressed: () {
-                                setState(() {
+                                editState(() {
                                   item.upgradeDelivery = null;
                                 });
                               },
@@ -608,7 +609,7 @@ class _InventoryViewState extends State<InventoryView> {
                         ),
                         FilledButton.icon(
                           onPressed: () {
-                            setState(() {
+                            editState(() {
                               item.upgradeDelivery!.time = DateTime.now();
                               Fluttertoast.showToast(msg: "Meido In Hebun!");
                             });
@@ -645,7 +646,7 @@ class _InventoryViewState extends State<InventoryView> {
                   Slider(
                     value: item.level.toDouble(),
                     onChanged: (n) {
-                      setState(() => item.level = n.toInt());
+                      editState(() => item.level = n.toInt());
                     },
                     min: Equipment.minLevel.toDouble(),
                     max: Equipment.maxLevel.toDouble(),
@@ -661,7 +662,7 @@ class _InventoryViewState extends State<InventoryView> {
                     child: Slider(
                       value: item.upgrade.toDouble(),
                       onChanged: (n) {
-                        setState(() => item.upgrade = n.toInt());
+                        editState(() => item.upgrade = n.toInt());
                       },
                       min: Equipment.minUpgrade.toDouble(),
                       max: Equipment.maxUpgrade.toDouble(),
@@ -708,7 +709,7 @@ class _InventoryViewState extends State<InventoryView> {
                     .map((ench) =>
                         AppliedEnchantment(ench, AppliedEnchantment.maxAspect))
                     .toList();
-                setState(() {
+                editState(() {
                   record.equipment[widget.equipmentType]!.add(equipment);
                   _searchEquipment(query);
                 });
